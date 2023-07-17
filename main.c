@@ -15,18 +15,18 @@ int main( int argc, char *argv[] ){
     int menuChoice;
 
     /* 2. Check command line arguments here. If a command line argument (for the file name) is missing, print out the following: ERROR: Missing file name and end the program */
-    if (argc < 1) { // checks if there is fewer than 2 cmd prompt arguments if there is, filename argument is missing (can be 1)
+    if (argc < 2) { // checks if there is fewer than 2 cmd prompt arguments if there is, filename argument is missing (can be 1)
         printf("ERROR: Missing file name\n"); // I am not sure if 2, but checking ./out and 1 argument here if there less then there is an error
         return 1; // meaning there is an error /////////I change argc to 1 and it worked? Not sure if right 
     }
 
     /* 3. Attempt to open the file. Print out Opening <filename>... before you call fopen(). */
 
-    char* filename = "data.csv";
+    char* filename = argv[1];
     printf("\nOpening %s\n", filename);
 
     fileIn = NULL; // initialize file pointer fileIn to NULL
-    fileIn = fopen("data.csv", "r"); // read
+    fileIn = fopen(filename, "r"); // read
 
     /* 4. Check to see if the file opens. If it does not open, print out ERROR: Could not open file and end the program. */
     if(fileIn == NULL){
@@ -42,6 +42,22 @@ int main( int argc, char *argv[] ){
     numOfRecords = fillRecords(records, fileIn);
     printf("Unique routes operated by airlines: %d\n", numOfRecords); ///////////////////////////////////////////////////////////////// SAYS 0
 
+
+
+    // Print the data in the records array for verification
+    for (int i = 0; i < numOfRecords; i++) {
+        printf("Route %d: Origin: %s, Destination: %s, Airline: %s\n", i + 1, records[i].origin, records[i].destination, records[i].airline);
+        for (int j = 0; j < 6; j++) {
+            printf("  Month %d: %d\n", j + 1, records[i].passengerNum[j]);
+        }
+    }
+   
+
+
+
+
+
+
     //5.3 Close the the file.
     fclose(fileIn);
 
@@ -56,17 +72,20 @@ int main( int argc, char *argv[] ){
         //printf("Enter your selection: "); // will be in voidmenu()
         while(scanf("%d", &menuChoice) != 1){ // gets the input from the user and checks if the return value of scanf is an int whihc is what we want. Not what the inout fromn us is, it is the return value. 
             printf("Please enter an integer from 1 to 5"); // do I need to clear the buffer? No. I do not . 
+            while(getchar() != '\n');
         }
 
         // 6.4 Create a switch/case statement to handle all the menu options
         switch(menuChoice){
             case 1: {  // if menuChoice == 1 (Route)
                 // Search by route 
+                char origin[4];
+                char destination[4];
                 printf("Enter origin: "); 
-                scanf("%3s", records -> origin); // 3 char code
+                scanf("%3s", origin); // 3 char code
                 printf("Enter destination: "); 
-                scanf("%3s", records -> destination); // 3 char code
-                searchRecords(records, numOfRecords, records -> origin, records -> destination, ROUTE); // function searchRecords call
+                scanf("%3s", destination); // 3 char code
+                searchRecords(records, numOfRecords, origin, destination, ROUTE); // function searchRecords call
                 break;
             }
             case 2: {  // if menuChoice == 2 (Origin Airport)
@@ -94,11 +113,12 @@ int main( int argc, char *argv[] ){
         
             
             default: // else
-                printf("\nInvalid choice.");
+                printf("Invalid choice.");
                 break;
 
             }
         }
+
         return 0;
         
     }
