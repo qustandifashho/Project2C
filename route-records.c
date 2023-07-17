@@ -4,7 +4,7 @@
 #include "route-records.h"
 
 RouteRecord* createRecords( FILE* fileIn ){
-    int countRecords = 0; // initialize to count number of records in the csv file
+    int countRecords = 0; // itialize to count number of records in the csv file
     char buffer[256]; // large enough to read csv file
 
     // Counting and updating the number of records in the file with a while loop. 
@@ -38,27 +38,42 @@ RouteRecord* createRecords( FILE* fileIn ){
 // This function will process the data in the CSV file. 
 // Essentially, the code will go through each record, parse out the record, and enter it into the array. 
 int fillRecords( RouteRecord* r, FILE* fileIn ){
+    printf("ENTERED FILLEDRECORDS FXN\n");
 
 
-// The function will call findAirlineRoute() to see if the exact route with the origin, destination, and airline was already entered in the array. 
-// If it was found, then you will update the existing record in your array with the passenger data for that month. 
-// Recall there should be six entries (one for each month) for each route operated by an airline. 
-// If the route operated by the airline does not already exist in the array, add this new route to the array
+    // The function will call findAirlineRoute() to see if the exact route with the origin, destination, and airline was already entered in the array. 
+    // If it was found, then you will update the existing record in your array with the passenger data for that month. 
+    // Recall there should be six entries (one for each month) for each route operated by an airline. 
+    // If the route operated by the airline does not already exist in the array, add this new route to the array
+    // Skip the header row
+    char buffer[256];
+    if (fgets(buffer, sizeof(buffer), fileIn) == NULL) {
+        // Error handling for cases where the header row is not present or there's an issue reading it.
+        printf("ERROR: Header row not found or reading the file failed.\n");
+        return 0; // Return 0 or an appropriate value to indicate an error.
+    }
+
+    // The rest of your code for processing the data...
     int countRecords = 0;
 
     // Read each line in CSV
     // %*d = discards month (dont need rn)
     // The rest are for the specific data in each column of the csv fikle. 
     while (fscanf(fileIn, "%*d,%3s,%3s,%2s,%*s,%d,%d,%d,%d,%d,%d", r[countRecords].origin, r[countRecords].destination, r[countRecords].airline, &r[countRecords].passengerNum[0], &r[countRecords].passengerNum[1], &r[countRecords].passengerNum[2], &r[countRecords].passengerNum[3], &r[countRecords].passengerNum[4], &r[countRecords].passengerNum[5]) == 9) { // works if gets 9 items from the data (stats)
-            // Call findAirlineRoute to see if the route already exists in the array
-            int exists = findAirlineRoute(r, countRecords, r[countRecords].origin, r[countRecords].destination, r[countRecords].airline, countRecords);
+        // Call findAirlineRoute to see if the route already exists in the array
+        int exists = findAirlineRoute(r, countRecords, r[countRecords].origin, r[countRecords].destination, r[countRecords].airline, countRecords);
+        printf("%d", exists); ////
 
-            if (exists == -1) {
+        if (exists == -1) {
+            printf("Exists = negatige 1");
             // The route does not exist in the array, add this new route
             countRecords++; // Increment the counter for the number of RouteRecords used in the array
-        } else {
+        } 
+        else {
+            printf("HELLO");
             // The route already exists in the array, update the existing record with passenger data for that month (months Jan - June or 1-6 (idices 0-5))
             r[exists].passengerNum[0] += r[countRecords].passengerNum[0];
+    
             r[exists].passengerNum[1] += r[countRecords].passengerNum[1];
             r[exists].passengerNum[2] += r[countRecords].passengerNum[2];
             r[exists].passengerNum[3] += r[countRecords].passengerNum[3];
@@ -67,14 +82,15 @@ int fillRecords( RouteRecord* r, FILE* fileIn ){
         }
     }
     return countRecords; // Return the actual number of RouteRecords used in the array
+    
 }
 
 
     // seeing if they match
-    int findAirlineRoute( RouteRecord* r, int length, const char* origin, const char* destination, const char* airline, int curIdx ){
-        // Base case: If we have reached the end of the array, return -1 (route not found)
-        if (curIdx >= length) {
-            return -1; // cannot find these three strings in the same struct object
+int findAirlineRoute( RouteRecord* r, int length, const char* origin, const char* destination, const char* airline, int curIdx ){
+    // Base case: If we have reached the end of the array, return -1 (route not found)
+    if (curIdx >= length) {
+         return -1; // cannot find these three strings in the same struct object
     }
     // if the strings are equal it return 0
     if (strcmp(r[curIdx].origin, origin) == 0 && strcmp(r[curIdx].destination, destination) == 0 && strcmp(r[curIdx].airline, airline) == 0) {
@@ -170,4 +186,3 @@ void printMenu() {
     printf("5. Quit\n");
     printf("Enter your selection: ");
 }
-
